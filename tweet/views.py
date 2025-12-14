@@ -4,6 +4,7 @@ from .forms import TweetForm,UserRegistration
 from django.shortcuts import get_object_or_404,redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
+from django.db.models import Q
 # Create your views here.
 def index(request):
     return render (request, 'index.html')
@@ -60,3 +61,13 @@ def register(request):
     else:
         form = UserRegistration()
     return render(request,'registration/registration.html',{'form':form})
+
+
+def search_tweets(request):
+    if request.method=="GET":
+        query=request.GET.get("q")
+        if query:
+            filtered_tweets=Tweet.objects.filter(Q(text__icontains=query))
+        else:
+            filtered_tweets = Tweet.objects.all()
+    return render(request, 'search_results.html',{'tweets':filtered_tweets})
